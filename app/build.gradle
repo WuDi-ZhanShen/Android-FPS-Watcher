@@ -1,0 +1,53 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'FPS.Watcher'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "FPS.Watcher"
+        minSdk 33
+        targetSdk 34
+        versionCode 4
+        versionName "4"
+        multiDexEnabled false
+
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('D:\\key.keystore') // Keystore文件的路径
+            storePassword 'wewewe' // Keystore密码
+            keyAlias 'key0' // Key别名
+            keyPassword 'wewewe' // Key密码
+        }
+    }
+    buildTypes {
+        release {
+            shrinkResources false
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    buildFeatures{
+        aidl true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+
+    implementation "dev.rikka.shizuku:api:13.1.0"
+    implementation "dev.rikka.shizuku:provider:13.1.0"
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+}
