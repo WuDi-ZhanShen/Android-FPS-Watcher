@@ -6,17 +6,17 @@ Module hiddenapi: Provide direct call to hidden api.
 
 
 # Core API
-IWindowManager.registerTaskFpsCallback(int taskId, ITaskFpsCallback callback); (Since Android 13+)
+IWindowManager.registerTaskFpsCallback(int taskId, ITaskFpsCallback callback); (Since Android 13+) -- Monitor a task's fps.
 
 
-IActivityTaskManager.registerITaskStackListener(ITaskStackListener listener);
+IActivityTaskManager.registerITaskStackListener(ITaskStackListener listener); -- Monitor forground task.
 
 
 # Other API
-IActivityManager.broadcastIntent();
+IActivityManager.broadcastIntent(); -- Send IBinder from Watch.class to FPSWatchService by Broadcast.
 
 
-IActivityTaskManager.getFocusedRootTaskInfo();
+IActivityTaskManager.getFocusedRootTaskInfo(); -- Get forground task immediately.
 
 
-IStatusBarService.collapsePanels();
+IStatusBarService.collapsePanels(); -- Collapse Notification Panel.
