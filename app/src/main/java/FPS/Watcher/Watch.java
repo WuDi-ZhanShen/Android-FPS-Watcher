@@ -221,7 +221,23 @@ public class Watch {
         IBinder token = new Binder();
 
         try {
-            ContentProviderHolder holder = iActivityManager.getContentProviderExternal(providerName, Os.getuid(), token, providerName);
+//            ContentProviderHolder holder = iActivityManager.getContentProviderExternal(providerName, Os.getuid(), token, providerName);
+            ContentProviderHolder holder = iActivityManager.getContentProviderExternal(providerName, 0, null, providerName);
+
+
+            // 反射调用
+//            ContentProviderHolder holder = (ContentProviderHolder) iActivityManager.getClass().getMethod(
+//                    "getContentProviderExternal",
+//                    String.class, int.class, IBinder.class, String.class).invoke(
+//                    iActivityManager,
+//                    providerName,   // 第1个参数 String
+//                    Os.getuid(),    // 第2个参数 int
+//                    token,          // 第3个参数 IBinder
+//                    providerName    // 第4个参数 String
+//            );
+
+
+
             IContentProvider provider = holder.provider;
             if (provider == null) {
                 return;
