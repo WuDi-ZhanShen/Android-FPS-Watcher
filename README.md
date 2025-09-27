@@ -16,7 +16,7 @@ IActivityTaskManager.registerITaskStackListener(ITaskStackListener listener); --
 
 
 # Other API
-IActivityManager.broadcastIntent(); -- Send IBinder from Watch.class to FPSWatchService by Broadcast.
+IActivityManager.getContentProviderExternal(); -- Send IBinder from Watch.class to FPSWatchService by ContentProvider.
 
 
 IActivityTaskManager.getFocusedRootTaskInfo(); -- Get forground task immediately.
