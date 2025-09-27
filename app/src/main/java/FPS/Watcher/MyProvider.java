@@ -5,14 +5,16 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
 public class MyProvider extends ContentProvider {
 
-    private static final String TAG = MyProvider.class.getSimpleName();
+//    private static final String TAG = MyProvider.class.getSimpleName();
     public static final String EXTRA_BINDER = "FPS.Watcher.intent.extra.BINDER";
+    public static final String EXTRA_KEEP_ALIVE = "FPS.Watcher.intent.extra.KEEP_ALIVE";
     public static final String ACTION_BINDER_RECEIVED = "FPS.Watcher.action.BINDER_RECEIVED";
     public static IBinder binder = null;
     public static IMyAidlInterface myAidlInterface = null;
@@ -41,6 +43,7 @@ public class MyProvider extends ContentProvider {
                 break;
             }
         }
+
         return reply;
     }
 
@@ -54,7 +57,7 @@ public class MyProvider extends ContentProvider {
 
     private void sendBinder(Bundle extras) {
         if (binder != null && binder.pingBinder()) {
-            Log.d(TAG, "sendBinder is called when already a living binder");
+//            Log.d(TAG, "sendBinder is called when already a living binder");
             return;
         }
 
@@ -63,7 +66,7 @@ public class MyProvider extends ContentProvider {
             return;
         }
 
-        Log.d(TAG, "binder received");
+//        Log.d(TAG, "binder received");
 
         binder = container.binder;
         myAidlInterface = IMyAidlInterface.Stub.asInterface(binder);

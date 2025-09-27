@@ -29,7 +29,6 @@
             android:id="@+id/title_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autoLink="all"
             android:gravity="center"
             android:padding="20dp"
             android:text="@string/app_label"
@@ -68,7 +67,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
+                    >
 
                     <TextView
                         android:id="@+id/text3"
@@ -161,6 +160,34 @@
                         android:layout_centerInParent="true"
                         android:gravity="center"
                         android:text="@string/notify_fore_change" />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
+
+                    <TextView
+                        android:id="@+id/text1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginHorizontal="20dp"
+                        android:gravity="end"
+                        android:text="@string/question_mark"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <Switch
+                        android:id="@+id/switch1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:text="@string/single_task" />
 
 
                 </RelativeLayout>
@@ -266,33 +293,7 @@
 
 
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
 
-                    <TextView
-                        android:id="@+id/text1"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerInParent="true"
-                        android:layout_marginHorizontal="20dp"
-                        android:gravity="end"
-                        android:text="@string/question_mark"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <Switch
-                        android:id="@+id/switch1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:gravity="center"
-                        android:text="@string/single_task" />
-
-
-                </RelativeLayout>
 
             </LinearLayout>
         </ScrollView>

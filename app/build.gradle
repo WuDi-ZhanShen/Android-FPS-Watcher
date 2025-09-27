@@ -10,8 +10,8 @@ android {
         applicationId "FPS.Watcher"
         minSdk 33
         targetSdk 35
-        versionCode 7
-        versionName "7"
+        versionCode 9
+        versionName "9"
         multiDexEnabled false
 
     }
@@ -33,7 +33,7 @@ android {
     }
     applicationVariants.configureEach { variant ->
         if (variant.buildType.name == "release") { // 只处理 release 类型
-            def appLabel = "FPS Watcher" // 你可以修改为想要的标签
+            def appLabel = "帧率计" // 你可以修改为想要的标签
             def appVersion = defaultConfig.versionName  // 使用 versionName 字段作为版本号
             variant.outputs.each { output ->
                 // 获取输出文件路径
@@ -59,7 +59,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+//    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation "dev.rikka.shizuku:api:13.1.0"
     implementation "dev.rikka.shizuku:provider:13.1.0"
     compileOnly project(":hiddenapi")

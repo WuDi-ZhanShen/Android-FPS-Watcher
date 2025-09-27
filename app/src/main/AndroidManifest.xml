@@ -54,6 +54,7 @@
                 android:value="true" />
         </service>
 
+
         <activity
             android:name=".ManageRecordActivity"
             android:exported="true"
@@ -63,6 +64,13 @@
             android:name=".RecordDetailActivity"
             android:exported="true"
             android:theme="@android:style/Theme.DeviceDefault.DayNight" />
+
+        <activity
+            android:name=".StartWatchActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:exported="true" />
+
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"

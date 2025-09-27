@@ -176,7 +176,12 @@ public class ManageRecordActivity extends Activity {
         csvFiles.sort(mCurrentSortTypeIsByLabel ?CsvFile.byAppLabel : CsvFile.byDate);
 
         ListView listView = new ListView(this);
-        setContentView(listView); // 或者 add 到其他布局
+
+
+
+        listView.setFitsSystemWindows(true); // 避免安卓15上进入edgeToEdge模式
+
+        setContentView(listView);
 
         AppIconLoader iconLoader = new AppIconLoader(this);
 

@@ -54,15 +54,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.LimitLine;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
+//import com.github.mikephil.charting.charts.LineChart;
+//import com.github.mikephil.charting.components.AxisBase;
+//import com.github.mikephil.charting.components.LimitLine;
+//import com.github.mikephil.charting.components.XAxis;
+//import com.github.mikephil.charting.components.YAxis;
+//import com.github.mikephil.charting.data.Entry;
+//import com.github.mikephil.charting.data.LineData;
+//import com.github.mikephil.charting.data.LineDataSet;
+//import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -94,8 +94,8 @@ public class FPSWatchService extends Service {
                     if (!isRecording) {
                         isRecording = true;
                         mRegisterTime = System.currentTimeMillis();
-                        if (lineData != null) lineData.notifyDataChanged();
-                        lineDataSet.notifyDataSetChanged();
+//                        if (lineData != null) lineData.notifyDataChanged();
+//                        lineDataSet.notifyDataSetChanged();
                         try {
                             PackageManager pm = context.getPackageManager();
                             ApplicationInfo appInfo = pm.getApplicationInfo(mWatchingPackageName, 0);
@@ -157,7 +157,7 @@ public class FPSWatchService extends Service {
                     break;
                 case "size":
                     size = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sharedPreferences.getInt(key, 40), getResources().getDisplayMetrics()));
-                    height = sharedPreferences.getBoolean("aspect_change", false) ? (size * 2 / 3) : size;
+                    height = sharedPreferences.getBoolean("aspect_change", true) ? (size * 2 / 3) : size;
                     params.width = size;
                     params.height = height;
                     windowManager.updateViewLayout(frameLayout, params);
@@ -176,7 +176,7 @@ public class FPSWatchService extends Service {
                     break;
                 case "aspect_change":
                     size = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sharedPreferences.getInt("size", 40), getResources().getDisplayMetrics()));
-                    height = sharedPreferences.getBoolean(key, false) ? (size * 2 / 3) : size;
+                    height = sharedPreferences.getBoolean(key, true) ? (size * 2 / 3) : size;
                     params.width = size;
                     params.height = height;
                     windowManager.updateViewLayout(frameLayout, params);
@@ -191,12 +191,12 @@ public class FPSWatchService extends Service {
     private LinearLayout toolsContainer;
     private ImageView tool1, tool2, tool3, appIcon;
     private FrameLayout frameLayout;
-    private LineChart lineChart;
-    private LineDataSet lineDataSet;
-    private LineData lineData;
-    private float sum = 0f;
-    private float count = 0;
-    private boolean isYAxisMaxSet;
+    private LineChartView lineChart;
+    //    private LineDataSet lineDataSet;
+//    private LineData lineData;
+//    private float sum = 0f;
+//    private float count = 0;
+//    private boolean isYAxisMaxSet;
     private int SCREEN_WIDTH, SCREEN_HEIGHT;
     private Notification.Builder notification = null;
     private NotificationManager notificationManager = null;
@@ -216,7 +216,7 @@ public class FPSWatchService extends Service {
                 notification.setSmallIcon(Icon.createWithBitmap(bitmap));
                 notificationManager.notify(1, notification.build());
             }
-            if (isRecording) addEntry(System.currentTimeMillis() - mRegisterTime, fps);
+            if (isRecording) lineChart.addPoint(System.currentTimeMillis() - mRegisterTime, fps);
         }
 
         @Override
@@ -249,7 +249,8 @@ public class FPSWatchService extends Service {
                         appIconView.setImageDrawable(getAppIcon(packageName));
                         animateTargetChange();
                     });
-                }}
+                }
+            }
 
         }
     };
@@ -425,18 +426,18 @@ public class FPSWatchService extends Service {
         sp.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
         isKeepWatching = sp.getBoolean("is_keep", true);
-        notifyForeAppChange = sp.getBoolean("notify_fore_change", true);
+        notifyForeAppChange = sp.getBoolean("notify_fore_change", false);
 
 
         GetWidthHeight();
 
-        lineDataSet = new LineDataSet(null, "FPS");
-        lineDataSet.setColor(getColor(R.color.right));
-        lineDataSet.setDrawValues(false);
-        lineDataSet.setDrawCircles(false);
-        lineDataSet.setLineWidth(2f);
-        lineDataSet.setDrawFilled(true);//填充底部颜色
-        lineDataSet.setFillColor(getColor(R.color.bg));
+//        lineDataSet = new LineDataSet(null, "FPS");
+//        lineDataSet.setColor(getColor(R.color.right));
+//        lineDataSet.setDrawValues(false);
+//        lineDataSet.setDrawCircles(false);
+//        lineDataSet.setLineWidth(2f);
+//        lineDataSet.setDrawFilled(true);//填充底部颜色
+//        lineDataSet.setFillColor(getColor(R.color.bg));
 
         if (Settings.canDrawOverlays(this) && sp.getBoolean("enable_float_window", true)) {
             initAppIconCache();
@@ -490,7 +491,7 @@ public class FPSWatchService extends Service {
                 .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
 
 
-        NotificationChannel notificationChannel = new NotificationChannel("watch", "帧率监测", NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel notificationChannel = new NotificationChannel("watch", getString(R.string.noti_channel_name), NotificationManager.IMPORTANCE_DEFAULT);
         notificationChannel.enableLights(false);
         notificationChannel.setShowBadge(false);
         notificationChannel.setImportance(NotificationManager.IMPORTANCE_MIN);
@@ -509,10 +510,10 @@ public class FPSWatchService extends Service {
     private void initFloatWindow() {
         int size = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sp.getInt("size", 40), getResources().getDisplayMetrics()));
 
-        int height = sp.getBoolean("aspect_change", false) ? (size * 2 / 3) : size;
+        int height = sp.getBoolean("aspect_change", true) ? (size * 2 / 3) : size;
         params = new WindowManager.LayoutParams(size, height, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.RGBA_8888);
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, PixelFormat.RGBA_8888);
         params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
 
 
@@ -524,7 +525,7 @@ public class FPSWatchService extends Service {
         textView.setTextColor(getColor(R.color.right));
         textView.setTypeface(null, Typeface.BOLD);
         textView.setTextSize(sp.getInt("text_size", 16));
-        textView.setText("FPS");
+        textView.setText(R.string.fps);
         textView.setGravity(Gravity.CENTER);
         float density = getResources().getDisplayMetrics().density;
         int ROUND_CORNER = sp.getInt("corner", 5);
@@ -574,7 +575,6 @@ public class FPSWatchService extends Service {
 
                         }
                         return true;
-
                     default:
                         return false;
                 }
@@ -603,7 +603,7 @@ public class FPSWatchService extends Service {
             textView.setVisibility(View.VISIBLE);
 
             int origSize = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sp.getInt("size", 40), getResources().getDisplayMetrics()));
-            int origHeight = sp.getBoolean("aspect_change", false) ? (origSize * 2 / 3) : origSize;
+            int origHeight = sp.getBoolean("aspect_change", true) ? (origSize * 2 / 3) : origSize;
             params.width = origSize;
             params.height = origHeight;
             windowManager.updateViewLayout(frameLayout, params);
@@ -615,8 +615,8 @@ public class FPSWatchService extends Service {
             if (!isRecording) {
                 isRecording = true;
                 mRegisterTime = System.currentTimeMillis();
-                lineData.notifyDataChanged();
-                lineDataSet.notifyDataSetChanged();
+//                lineData.notifyDataChanged();
+//                lineDataSet.notifyDataSetChanged();
                 Toast.makeText(this, R.string.toast_start_record, Toast.LENGTH_SHORT).show();
             }
 
@@ -644,7 +644,7 @@ public class FPSWatchService extends Service {
         tool3.setOnClickListener(v -> saveRecordAndStopSelf());
 
 
-        lineChart = new LineChart(this);
+        lineChart = new LineChartView(this, false);
         int lineChartWidth = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) * 4 / 5;
         int lineChartHeight = lineChartWidth * 2 / 3;
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(lineChartWidth, lineChartHeight);
@@ -654,7 +654,7 @@ public class FPSWatchService extends Service {
         oval3.getPaint().setColor(getColor(R.color.colorAccent));
         lineChart.setBackground(oval3);
         lineChart.setVisibility(View.GONE);
-        setupChart();
+//        setupChart();
 
 
         toolsContainer.addView(tool1);
@@ -667,6 +667,19 @@ public class FPSWatchService extends Service {
         frameLayout.addView(lineChart);
         frameLayout.addView(toolsContainer);
 
+//        frameLayout.setOnTouchListener((view, motionEvent) -> {
+//            switch(motionEvent.getAction()){
+//                case MotionEvent.ACTION_OUTSIDE:
+//                    toolsContainer.setVisibility(View.GONE);
+//                    appIconView.setVisibility(View.GONE);
+//                    lineChart.setVisibility(View.GONE);
+//                    textView.setVisibility(View.VISIBLE);
+//                    windowManager.updateViewLayout(frameLayout, params);
+//                    return false;
+//                default:
+//                    return false;
+//            }
+//        });
 
         LayoutTransition transition = new LayoutTransition();
         transition.setDuration(200L);
@@ -679,85 +692,85 @@ public class FPSWatchService extends Service {
     }
 
 
-    private void setupChart() {
+//    private void setupChart() {
 
 
-        lineData = new LineData(lineDataSet);
-        lineChart.setData(lineData);
-
-        lineChart.setDoubleTapToZoomEnabled(false);
-        lineChart.getDescription().setEnabled(false);
-        lineChart.setTouchEnabled(true);
-        lineChart.setScaleEnabled(false);
-        lineChart.setPinchZoom(false);
-        lineChart.setDrawGridBackground(false);
-        lineChart.setHighlightPerTapEnabled(false);       // 禁止点击高亮
-        lineChart.setHighlightPerDragEnabled(false);      // 禁止拖拽高亮
-
-
-        lineChart.getLegend().setEnabled(false);
-        lineChart.getAxisLeft().setAxisMinimum(0f);
-        lineChart.getAxisLeft().setAxisMaximum(60f);
-        isYAxisMaxSet = true;
-
-        XAxis xAxis = lineChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1000f);
-        xAxis.setValueFormatter(new ValueFormatter() {
-            private final SimpleDateFormat sdf = new SimpleDateFormat("m:ss", Locale.getDefault());
-
-            @Override
-            public String getAxisLabel(float value, AxisBase axis) {
-                return sdf.format(new Date((long) value));
-            }
-        });
-
-        lineChart.getXAxis().setTextColor(getColor(R.color.right));
-        lineChart.getAxisLeft().setTextColor(getColor(R.color.right));
-        lineChart.getAxisRight().setEnabled(false);
-    }
-
-
-    private void addEntry(float timestamp, float value) {
-        lineDataSet.addEntry(new Entry(timestamp, value));
-        lineData.notifyDataChanged();
-        lineChart.notifyDataSetChanged();
-        count++;
-        sum += value;
-        int average = (int) (sum / count);
-
-        if (lineChart.getVisibility() == View.VISIBLE) {
-            if (value > 60f && isYAxisMaxSet) {
-                lineChart.getAxisLeft().resetAxisMaximum();
-                isYAxisMaxSet = false;
-            }
+//        lineData = new LineData(lineDataSet);
+//        lineChart.setData(lineData);
+//
+//        lineChart.setDoubleTapToZoomEnabled(false);
+//        lineChart.getDescription().setEnabled(false);
+//        lineChart.setTouchEnabled(true);
+//        lineChart.setScaleEnabled(false);
+//        lineChart.setPinchZoom(false);
+//        lineChart.setDrawGridBackground(false);
+//        lineChart.setHighlightPerTapEnabled(false);       // 禁止点击高亮
+//        lineChart.setHighlightPerDragEnabled(false);      // 禁止拖拽高亮
+//
+//
+//        lineChart.getLegend().setEnabled(false);
+//        lineChart.getAxisLeft().setAxisMinimum(0f);
+//        lineChart.getAxisLeft().setAxisMaximum(60f);
+//        isYAxisMaxSet = true;
+//
+//        XAxis xAxis = lineChart.getXAxis();
+//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+//        xAxis.setGranularity(1000f);
+//        xAxis.setValueFormatter(new ValueFormatter() {
+//            private final SimpleDateFormat sdf = new SimpleDateFormat("m:ss", Locale.getDefault());
+//
+//            @Override
+//            public String getAxisLabel(float value, AxisBase axis) {
+//                return sdf.format(new Date((long) value));
+//            }
+//        });
+//
+//        lineChart.getXAxis().setTextColor(getColor(R.color.right));
+//        lineChart.getAxisLeft().setTextColor(getColor(R.color.right));
+//        lineChart.getAxisRight().setEnabled(false);
+//    }
 
 
-            // 设置最大可见区域为60秒
-            lineChart.setVisibleXRangeMaximum(60000f);
-            lineChart.moveViewToX(timestamp);
-
-            if (count > 10) {
-                YAxis leftAxis = lineChart.getAxisLeft();
-                LimitLine avgLine = new LimitLine(average, getString(R.string.average) + average);
-                int color = getColor(R.color.right);
-                int red = Color.red(color);
-                int green = Color.green(color);
-                int blue = Color.blue(color);
-
-                int colorWithAlpha = Color.argb(128, red, green, blue); // 128 = 半透明
-
-                avgLine.setLineColor(colorWithAlpha);
-                avgLine.setLineWidth(2f);
-                avgLine.setTextColor(colorWithAlpha);
-                avgLine.setTextSize(12f);
-                avgLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
-
-                leftAxis.removeAllLimitLines(); // 如果之前有其他 LimitLine
-                leftAxis.addLimitLine(avgLine);
-            }
-        }
-    }
+//    private void addEntry(float timestamp, float value) {
+//        lineDataSet.addEntry(new Entry(timestamp, value));
+//        lineData.notifyDataChanged();
+//        lineChart.notifyDataSetChanged();
+//        count++;
+//        sum += value;
+//        int average = (int) (sum / count);
+//
+//        if (lineChart.getVisibility() == View.VISIBLE) {
+//            if (value > 60f && isYAxisMaxSet) {
+//                lineChart.getAxisLeft().resetAxisMaximum();
+//                isYAxisMaxSet = false;
+//            }
+//
+//
+//            // 设置最大可见区域为60秒
+//            lineChart.setVisibleXRangeMaximum(60000f);
+//            lineChart.moveViewToX(timestamp);
+//
+//            if (count > 10) {
+//                YAxis leftAxis = lineChart.getAxisLeft();
+//                LimitLine avgLine = new LimitLine(average, getString(R.string.average) + average);
+//                int color = getColor(R.color.right);
+//                int red = Color.red(color);
+//                int green = Color.green(color);
+//                int blue = Color.blue(color);
+//
+//                int colorWithAlpha = Color.argb(128, red, green, blue); // 128 = 半透明
+//
+//                avgLine.setLineColor(colorWithAlpha);
+//                avgLine.setLineWidth(2f);
+//                avgLine.setTextColor(colorWithAlpha);
+//                avgLine.setTextSize(12f);
+//                avgLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+//
+//                leftAxis.removeAllLimitLines(); // 如果之前有其他 LimitLine
+//                leftAxis.addLimitLine(avgLine);
+//            }
+//        }
+//    }
 
     public static File getFPSRecordFolder(Context context) {
         return new File(context.getExternalFilesDir(null), "FPSRecord");
@@ -772,10 +785,10 @@ public class FPSWatchService extends Service {
         StringBuilder sb = new StringBuilder();
         sb.append(csvHeader1).append(",").append(csvHeader2).append("\n"); // CSV header
         final SimpleDateFormat sdf = new SimpleDateFormat("m:ss.SSS", Locale.getDefault());
-
-        for (Entry entry : lineDataSet.getValues()) {
-            long timestamp = (long) entry.getX();
-            float value = entry.getY();
+        int size = lineChart.dataX.size();
+        for (int i = 0; i < size; i++) {
+            long timestamp = lineChart.dataX.get(i);
+            float value = lineChart.dataY.get(i);
             sb.append(sdf.format(timestamp)).append(",").append(value).append("\n");
         }
 
@@ -863,11 +876,11 @@ public class FPSWatchService extends Service {
             oval3.getPaint().setColor(getColor(R.color.colorAccent));
             lineChart.setBackground(oval3);
 
-            lineChart.getXAxis().setTextColor(getColor(R.color.right));
-            lineChart.getAxisLeft().setTextColor(getColor(R.color.right));
-
-            lineDataSet.setColor(getColor(R.color.right));
-            lineDataSet.setFillColor(getColor(R.color.bg));
+//            lineChart.getXAxis().setTextColor(getColor(R.color.right));
+//            lineChart.getAxisLeft().setTextColor(getColor(R.color.right));
+//
+//            lineDataSet.setColor(getColor(R.color.right));
+//            lineDataSet.setFillColor(getColor(R.color.bg));
         }
         mLastConfig = new Configuration(newConfig);
     }

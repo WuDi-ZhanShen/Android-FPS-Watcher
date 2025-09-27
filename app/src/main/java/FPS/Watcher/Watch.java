@@ -1,11 +1,11 @@
 package FPS.Watcher;
 
 import static FPS.Watcher.MyProvider.EXTRA_BINDER;
+import static FPS.Watcher.MyProvider.EXTRA_KEEP_ALIVE;
 import static FPS.Watcher.MyProvider.METHOD_SEND_BINDER;
 
 import android.app.ActivityManager;
 import android.app.ActivityTaskManager;
-import android.app.ActivityThread;
 import android.app.ContentProviderHolder;
 import android.app.IActivityManager;
 import android.app.IActivityTaskManager;
@@ -15,34 +15,30 @@ import android.content.AttributionSource;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.IContentProvider;
-import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.system.Os;
-import android.util.Log;
 import android.view.IWindowManager;
 import android.window.ITaskFpsCallback;
 
 import com.android.internal.statusbar.IStatusBarService;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-
 
 public class Watch {
     public static final String SEND_BINDER_ACTION = "intent.FPSWatch.SendBinder";
+    public static final String FPS_WATCHER = "FPS.Watcher";
+    public static final String providerAuth = "FPS.Watcher.provider";
     public static int currentWatchingTaskId = 0;
     public static boolean isFpsCallBackRegistered = false;
     public static String currentWatchingPackageName = "";
     public static String currentWatchingClassName = "";
     public static boolean isKeepWatching = false;
     public static IFpsCallback iFpsCallback = null;
-//    static public Intent intent = null;
+    //    static public Intent intent = null;
     public static IActivityTaskManager iActivityTaskManager = null;
     static public IActivityManager iActivityManager = null;
     static public IWindowManager iWindowManager = null;
@@ -167,6 +163,8 @@ public class Watch {
                 if (packageName.equals(currentWatchingPackageName)) {
                     registerFpsCallback(taskInfo.taskId);
                 }
+            } else if (packageName.equals(FPS_WATCHER)) {
+                sendBinderToAppByContentProvider();
             }
         }
     };
@@ -216,13 +214,12 @@ public class Watch {
 
 
     private static void sendBinderToAppByContentProvider() {
-        String packageName = "FPS.Watcher";
-        String providerName = "FPS.Watcher.provider";
+
         IBinder token = new Binder();
 
         try {
-//            ContentProviderHolder holder = iActivityManager.getContentProviderExternal(providerName, Os.getuid(), token, providerName);
-            ContentProviderHolder holder = iActivityManager.getContentProviderExternal(providerName, 0, null, providerName);
+//            ContentProviderHolder holder = iActivityManager.getContentProviderExternal(providerAuth, Os.getuid(), token, providerAuth);
+            ContentProviderHolder holder = iActivityManager.getContentProviderExternal(providerAuth, 0, null, providerAuth);
 
 
             // 反射调用
@@ -237,7 +234,9 @@ public class Watch {
 //            );
 
 
-
+            if (holder == null) {
+                return;
+            }
             IContentProvider provider = holder.provider;
             if (provider == null) {
                 return;
@@ -248,25 +247,10 @@ public class Watch {
 
             Bundle extra = new Bundle();
             extra.putParcelable(EXTRA_BINDER, new BinderContainer(iMyAidlInterface));
-            Bundle reply = holder.provider.call((new AttributionSource.Builder(Os.getuid())).setAttributionTag(null).setPackageName(packageName).build(), providerName, METHOD_SEND_BINDER, null, extra);
+            Bundle reply = holder.provider.call((new AttributionSource.Builder(Os.getuid())).setAttributionTag(null).setPackageName(FPS_WATCHER).build(), providerAuth, METHOD_SEND_BINDER, null, extra);
 
-            iActivityManager.removeContentProviderExternalAsUser(providerName, token, Os.getuid());
+            iActivityManager.removeContentProviderExternalAsUser(providerAuth, token, Os.getuid());
 
-            //            ActivityThread activityThread = new ActivityThread();
-            Constructor<?> activityThreadConstructor = ActivityThread.class.getDeclaredConstructor();
-            activityThreadConstructor.setAccessible(true);
-            ActivityThread activityThread = (ActivityThread) activityThreadConstructor.newInstance();
-
-
-            // ActivityThread.sCurrentActivityThread = activityThread;
-            Field sCurrentActivityThreadField = ActivityThread.class.getDeclaredField("sCurrentActivityThread");
-            sCurrentActivityThreadField.setAccessible(true);
-            sCurrentActivityThreadField.set(null, activityThread);
-
-            // activityThread.mSystemThread = true;
-            Field mSystemThreadField = ActivityThread.class.getDeclaredField("mSystemThread");
-            mSystemThreadField.setAccessible(true);
-            mSystemThreadField.setBoolean(activityThread, true);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -286,7 +270,8 @@ public class Watch {
 //
 //
 //            // 安卓15无法立即收到粘性广播，因而补发一条普通广播
-////            ActivityThread activityThread = new ActivityThread();
+
+    ////            ActivityThread activityThread = new ActivityThread();
 //            Constructor<?> activityThreadConstructor = ActivityThread.class.getDeclaredConstructor();
 //            activityThreadConstructor.setAccessible(true);
 //            ActivityThread activityThread = (ActivityThread) activityThreadConstructor.newInstance();
@@ -329,6 +314,7 @@ public class Watch {
             e.printStackTrace();
         }
     }
+
     public static void unregisterFpsCallback() {
         if (!isFpsCallBackRegistered) return;
         isFpsCallBackRegistered = false;

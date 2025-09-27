@@ -8,11 +8,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
@@ -25,21 +23,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.LimitLine;
-import com.github.mikephil.charting.components.MarkerView;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.utils.MPPointF;
+//import com.github.mikephil.charting.charts.LineChart;
+//import com.github.mikephil.charting.components.AxisBase;
+//import com.github.mikephil.charting.components.LimitLine;
+//import com.github.mikephil.charting.components.MarkerView;
+//import com.github.mikephil.charting.components.XAxis;
+//import com.github.mikephil.charting.components.YAxis;
+//import com.github.mikephil.charting.data.Entry;
+//import com.github.mikephil.charting.data.LineData;
+//import com.github.mikephil.charting.data.LineDataSet;
+//import com.github.mikephil.charting.formatter.ValueFormatter;
+//import com.github.mikephil.charting.highlight.Highlight;
+//import com.github.mikephil.charting.utils.MPPointF;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -56,9 +53,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class RecordDetailActivity extends Activity {
-    LineChart lineChart;
-    LineDataSet lineDataSet;
-    LineData lineData;
+//    LineChart lineChart;
+//    LineDataSet lineDataSet;
+//    LineData lineData;
+    LineChartView lineChart;
     File file;
     String date, appName, appLabel;
 
@@ -81,42 +79,43 @@ public class RecordDetailActivity extends Activity {
         SimpleDateFormat sdf = new SimpleDateFormat("m:ss.SSS", Locale.getDefault());
         sdf.setTimeZone(TimeZone.getTimeZone("UTC")); // 👈 避免时区偏移
 
-        lineChart = new LineChart(this);
+        lineChart = new LineChartView(this,true);
+//        lineChart = new LineChart(this);
         SharedPreferences sp = getSharedPreferences("s", 0);
         float density = getResources().getDisplayMetrics().density;
         int ROUND_CORNER = sp.getInt("corner", 5);
         ShapeDrawable oval3 = new ShapeDrawable(new RoundRectShape(new float[]{ROUND_CORNER * density, ROUND_CORNER * density, ROUND_CORNER * density, ROUND_CORNER * density, ROUND_CORNER * density, ROUND_CORNER * density, ROUND_CORNER * density, ROUND_CORNER * density}, null, null));
         oval3.getPaint().setColor(getColor(R.color.colorAccent));
         lineChart.setBackground(oval3);
+//
+//        lineChart.setDoubleTapToZoomEnabled(false);
+//        lineChart.getDescription().setEnabled(false);
+//        lineChart.setTouchEnabled(true);
+//        lineChart.setScaleEnabled(true);
+//        lineChart.setPinchZoom(false);
+//        lineChart.setDrawGridBackground(false);
+//        lineChart.setHighlightPerTapEnabled(true);       // 禁止点击高亮
+//        lineChart.setHighlightPerDragEnabled(false);      // 禁止拖拽高亮
+//        MarkerView markerView = new FpsMarkerView(this);
+//        markerView.setChartView(lineChart); // 必须设置
+//        lineChart.setMarker(markerView);
+////        lineChart.setVisibleXRangeMaximum(600000f);
+//
+//        lineChart.getLegend().setEnabled(false);
+//        lineChart.getAxisRight().setEnabled(false);
+//        lineChart.getAxisLeft().setAxisMinimum(0f);
+//        lineChart.getAxisLeft().setAxisMaximum(60f);
+//        boolean isYAxisMaxSet = true;
+//
+//        lineChart.getAxisLeft().setTextColor(getColor(R.color.right));
+//
 
-        lineChart.setDoubleTapToZoomEnabled(false);
-        lineChart.getDescription().setEnabled(false);
-        lineChart.setTouchEnabled(true);
-        lineChart.setScaleEnabled(true);
-        lineChart.setPinchZoom(false);
-        lineChart.setDrawGridBackground(false);
-        lineChart.setHighlightPerTapEnabled(true);       // 禁止点击高亮
-        lineChart.setHighlightPerDragEnabled(false);      // 禁止拖拽高亮
-        MarkerView markerView = new FpsMarkerView(this);
-        markerView.setChartView(lineChart); // 必须设置
-        lineChart.setMarker(markerView);
-//        lineChart.setVisibleXRangeMaximum(600000f);
-
-        lineChart.getLegend().setEnabled(false);
-        lineChart.getAxisRight().setEnabled(false);
-        lineChart.getAxisLeft().setAxisMinimum(0f);
-        lineChart.getAxisLeft().setAxisMaximum(60f);
-        boolean isYAxisMaxSet = true;
-
-        lineChart.getAxisLeft().setTextColor(getColor(R.color.right));
 
 
+//        float sum = 0f;
+//        float count = 0;
 
-
-        float sum = 0f;
-        float count = 0;
-
-        List<Entry> entries = new ArrayList<>();
+        List<LineChartView.Point> entries = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             reader.readLine(); // 读首行header
             String line;
@@ -126,81 +125,84 @@ public class RecordDetailActivity extends Activity {
                 if (parts.length == 2) {
                     String timeStr = parts[0].trim();
                     float fps = Float.parseFloat(parts[1].trim());
-                    count++;
-                    sum += fps;
-                    if (fps > 60f && isYAxisMaxSet) {
-                        lineChart.getAxisLeft().resetAxisMaximum();
-                        isYAxisMaxSet = false;
-                    }
+//                    count++;
+//                    sum += fps;
+//                    if (fps > 60f && isYAxisMaxSet) {
+//                        lineChart.getAxisLeft().resetAxisMaximum();
+//                        isYAxisMaxSet = false;
+//                    }
                     Date date = sdf.parse(timeStr);
-                    long millis = date.getTime();
-                    entries.add(new Entry( millis, fps));
+                    long mills = date.getTime();
+                    entries.add(new LineChartView.Point(mills, fps));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        lineDataSet = new LineDataSet(entries, "FPS");
+        lineChart.setPointsData(entries);
 
-        lineDataSet.setColor(getColor(R.color.right));
-        lineDataSet.setDrawValues(false);
-        lineDataSet.setDrawCircles(false);
-        lineDataSet.setLineWidth(2f);
-        lineDataSet.setDrawFilled(true);//填充底部颜色
-        lineDataSet.setFillColor(getColor(R.color.bg));
+//        lineDataSet = new LineDataSet(entries, "FPS");
+//
+//        lineDataSet.setColor(getColor(R.color.right));
+//        lineDataSet.setDrawValues(false);
+//        lineDataSet.setDrawCircles(false);
+//        lineDataSet.setLineWidth(2f);
+//        lineDataSet.setDrawFilled(true);//填充底部颜色
+//        lineDataSet.setFillColor(getColor(R.color.bg));
+//
+//
+//
+//        lineData = new LineData(lineDataSet);
+//        lineChart.setData(lineData);
 
 
 
-        lineData = new LineData(lineDataSet);
-        lineChart.setData(lineData);
-
-
-
-        XAxis xAxis = lineChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1000f);
-
-        xAxis.setValueFormatter(new ValueFormatter() {
-          private final SimpleDateFormat sdf = new SimpleDateFormat("m:ss", Locale.getDefault());
-            @Override
-            public String getAxisLabel(float value, AxisBase axis) {
-                return sdf.format(new Date((long) value));
-            }
-        });
-
-        xAxis.setTextColor(getColor(R.color.right));
-
-        int average = (int) (sum / count);
-        if (count > 10) {
-            YAxis leftAxis = lineChart.getAxisLeft();
-            LimitLine avgLine = new LimitLine(average, getString(R.string.average) + average);
-            int color = getColor(R.color.right);
-            int red = Color.red(color);
-            int green = Color.green(color);
-            int blue = Color.blue(color);
-
-            int colorWithAlpha = Color.argb(128, red, green, blue); // 128 = 半透明
-
-            avgLine.setLineColor(colorWithAlpha);
-            avgLine.setLineWidth(2f);
-            avgLine.setTextColor(colorWithAlpha);
-            avgLine.setTextSize(12f);
-            avgLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
-
-            leftAxis.removeAllLimitLines(); // 如果之前有其他 LimitLine
-            leftAxis.addLimitLine(avgLine);
-        }
+//        XAxis xAxis = lineChart.getXAxis();
+//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+//        xAxis.setGranularity(1000f);
+//
+//        xAxis.setValueFormatter(new ValueFormatter() {
+//          private final SimpleDateFormat sdf = new SimpleDateFormat("m:ss", Locale.getDefault());
+//            @Override
+//            public String getAxisLabel(float value, AxisBase axis) {
+//                return sdf.format(new Date((long) value));
+//            }
+//        });
+//
+//        xAxis.setTextColor(getColor(R.color.right));
+//
+//        int average = (int) (sum / count);
+//        if (count > 10) {
+//            YAxis leftAxis = lineChart.getAxisLeft();
+//            LimitLine avgLine = new LimitLine(average, getString(R.string.average) + average);
+//            int color = getColor(R.color.right);
+//            int red = Color.red(color);
+//            int green = Color.green(color);
+//            int blue = Color.blue(color);
+//
+//            int colorWithAlpha = Color.argb(128, red, green, blue); // 128 = 半透明
+//
+//            avgLine.setLineColor(colorWithAlpha);
+//            avgLine.setLineWidth(2f);
+//            avgLine.setTextColor(colorWithAlpha);
+//            avgLine.setTextSize(12f);
+//            avgLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+//
+//            leftAxis.removeAllLimitLines(); // 如果之前有其他 LimitLine
+//            leftAxis.addLimitLine(avgLine);
+//        }
 //        lineChart.moveViewToX(entries.get(entries.size() - 1).getX()); // 移动到最后
 
 
 
         FrameLayout lineChartContainer = new MyFrameLayout(this);
+
         lineChartContainer.addView(lineChart, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
 
 
-        FrameLayout container = new MyFrameLayout(this);
+        FrameLayout container = new FrameLayout(this);
 
         container.addView(lineChartContainer);
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -213,7 +215,7 @@ public class RecordDetailActivity extends Activity {
              appLabel = getAppLabelByName(getPackageManager(),appName);
             setTitle(date + " " + appLabel);
         }
-
+        container.setFitsSystemWindows(true); // 避免安卓15上进入edgeToEdge模式
         setContentView(container);
     }
 
@@ -247,30 +249,30 @@ public class RecordDetailActivity extends Activity {
 
     }
 
-    public class FpsMarkerView extends MarkerView {
-        private final TextView tvContent;
-
-
-        public FpsMarkerView(Context context) {
-            super(context, R.layout.marker); // 你可以自己定义 layout，也可以下面我提供一个简单示例
-            tvContent = findViewById(R.id.tvContent);
-        }
-
-        @Override
-        public void refreshContent(Entry e, Highlight highlight) {
-            float fps = e.getY();
-            String label = "FPS: " + fps;
-            tvContent.setText(label);
-            tvContent.setTextColor(getColor(R.color.right));
-            super.refreshContent(e, highlight);
-        }
-
-        @Override
-        public MPPointF getOffset() {
-            // 居中浮窗
-            return new MPPointF(-(getWidth() / 2f), -getHeight());
-        }
-    }
+//    public class FpsMarkerView extends MarkerView {
+//        private final TextView tvContent;
+//
+//
+//        public FpsMarkerView(Context context) {
+//            super(context, R.layout.marker); // 你可以自己定义 layout，也可以下面我提供一个简单示例
+//            tvContent = findViewById(R.id.tvContent);
+//        }
+//
+//        @Override
+//        public void refreshContent(Entry e, Highlight highlight) {
+//            float fps = e.getY();
+//            String label = "FPS: " + fps;
+//            tvContent.setText(label);
+//            tvContent.setTextColor(getColor(R.color.right));
+//            super.refreshContent(e, highlight);
+//        }
+//
+//        @Override
+//        public MPPointF getOffset() {
+//            // 居中浮窗
+//            return new MPPointF(-(getWidth() / 2f), -getHeight());
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

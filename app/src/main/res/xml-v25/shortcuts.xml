@@ -25,6 +25,18 @@
         <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
     </shortcut>
 
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutId="MyCollection"
+        android:shortcutShortLabel="@string/start_watch_toast">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="FPS.Watcher.StartWatchActivity"
+            android:targetPackage="FPS.Watcher" />
+        <categories android:name="android.shortcut.conversation" />
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+    </shortcut>
 
 
 </shortcuts>

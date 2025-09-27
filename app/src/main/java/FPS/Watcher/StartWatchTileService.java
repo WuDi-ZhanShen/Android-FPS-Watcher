@@ -2,10 +2,12 @@ package FPS.Watcher;
 
 import android.app.ActivityManager;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
@@ -19,13 +21,14 @@ public class StartWatchTileService extends TileService {
     public void onTileAdded() {
         Tile tile = getQsTile();
         if (tile == null) return;
-        if (isActivated()) {
-            tile.setState(isFPSWatchServiceRunning(this) ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
-            tile.setLabel(getString(R.string.app_label));
-        } else {
-            tile.setState(Tile.STATE_UNAVAILABLE);
-            tile.setLabel(getString(R.string.longpress_to_activate));
-        }
+        tile.setState(isFPSWatchServiceRunning(this) ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
+//        if (isActivated()) {
+//            tile.setState(isFPSWatchServiceRunning(this) ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
+//            tile.setLabel(getString(R.string.app_label));
+//        } else {
+//            tile.setState(Tile.STATE_UNAVAILABLE);
+//            tile.setLabel(getString(R.string.longpress_to_activate));
+//        }
         tile.updateTile();
         super.onTileAdded();
     }
@@ -34,13 +37,14 @@ public class StartWatchTileService extends TileService {
     public void onStartListening() {
         Tile tile = getQsTile();
         if (tile == null) return;
-        if (isActivated()) {
-            tile.setState(isFPSWatchServiceRunning(this) ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
-            tile.setLabel(getString(R.string.app_label));
-        } else {
-            tile.setState(Tile.STATE_UNAVAILABLE);
-            tile.setLabel(getString(R.string.longpress_to_activate));
-        }
+        tile.setState(isFPSWatchServiceRunning(this) ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
+//        if (isActivated()) {
+//            tile.setState(isFPSWatchServiceRunning(this) ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
+//            tile.setLabel(getString(R.string.app_label));
+//        } else {
+//            tile.setState(Tile.STATE_UNAVAILABLE);
+//            tile.setLabel(getString(R.string.longpress_to_activate));
+//        }
         tile.updateTile();
         super.onStartListening();
     }
@@ -49,10 +53,13 @@ public class StartWatchTileService extends TileService {
     public void onClick() {
         Tile tile = getQsTile();
         if (tile == null) return;
-        if (isFPSWatchServiceRunning(this)) {
+        boolean isFPSWatchServiceRunning = isFPSWatchServiceRunning(this);
+        tile.setState(isFPSWatchServiceRunning ? Tile.STATE_INACTIVE : Tile.STATE_ACTIVE);
+        tile.updateTile();
+        if (isFPSWatchServiceRunning) {
             sendBroadcast(new Intent(FPSWatchService.EXIT_ACTION));
             tile.setState(Tile.STATE_INACTIVE);
-        } else {
+        } else if (isActivated()) {
             SharedPreferences sp = getSharedPreferences("s", 0);
             if (sp.getBoolean("enable_notification", true)) {
                 if (!((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).areNotificationsEnabled()) {
@@ -70,9 +77,19 @@ public class StartWatchTileService extends TileService {
                 }
             }
             tile.setState(Tile.STATE_ACTIVE);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(this, StartWatchActivity.class), PendingIntent.FLAG_IMMUTABLE);
+                startActivityAndCollapse(intent);
+            } else {
+                Intent intent = new Intent(this, StartWatchActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivityAndCollapse(intent);
+            }
+            tile.setState(Tile.STATE_ACTIVE);
         }
-        tile.updateTile();
-
+        
         super.onClick();
     }
 

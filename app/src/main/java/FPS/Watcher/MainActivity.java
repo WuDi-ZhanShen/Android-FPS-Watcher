@@ -118,20 +118,20 @@ public class MainActivity extends Activity {
         window.setStatusBarColor(Color.TRANSPARENT);
 
         SharedPreferences sp = getSharedPreferences("s", 0);
-        if (sp.getBoolean("first", true)) {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.privacy)
-                    .setMessage(R.string.privacypolicy)
-                    .setNegativeButton(R.string.agree, (dialogInterface, i) -> {
-//                        help();
-                        sp.edit().putBoolean("first", false).apply();
-                    })
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.disagree, (dialogInterface, i) -> finish())
-                    .show();
-
-
-        }
+//        if (sp.getBoolean("first", true)) {
+//            new AlertDialog.Builder(this)
+//                    .setTitle(R.string.privacy)
+//                    .setMessage(R.string.privacypolicy)
+//                    .setNegativeButton(R.string.agree, (dialogInterface, i) -> {
+////                        help();
+//                        sp.edit().putBoolean("first", false).apply();
+//                    })
+//                    .setCancelable(false)
+//                    .setPositiveButton(R.string.disagree, (dialogInterface, i) -> finish())
+//                    .show();
+//
+//
+//        }
 
         setButtonsOnclick(isNight, sp);
 
@@ -213,7 +213,7 @@ public class MainActivity extends Activity {
 
 
         Switch switch2 = findViewById(R.id.switch2);
-        switch2.setChecked(sp.getBoolean("aspect_change", false));
+        switch2.setChecked(sp.getBoolean("aspect_change", true));
         switch2.setOnCheckedChangeListener((buttonView, isChecked) -> sp.edit().putBoolean("aspect_change", isChecked).apply());
 
         Switch switch3 = findViewById(R.id.switch3);
@@ -229,7 +229,7 @@ public class MainActivity extends Activity {
         textView4.setOnClickListener(v -> showFloatWindowHelp());
 
         Switch switch5 = findViewById(R.id.switch5);
-        switch5.setChecked(sp.getBoolean("notify_fore_change", true));
+        switch5.setChecked(sp.getBoolean("notify_fore_change", false));
         switch5.setOnCheckedChangeListener((buttonView, isChecked) -> sp.edit().putBoolean("notify_fore_change", isChecked).apply());
         TextView textView5 = findViewById(R.id.text5);
         textView5.setOnClickListener(v -> showNotifyForeChangeHelp());
@@ -352,7 +352,7 @@ public class MainActivity extends Activity {
             return false;
         });
 
-//        findViewById(R.id.title_text).setOnClickListener(view -> help());
+        findViewById(R.id.title_text).setOnClickListener(view -> help());
         float density = getResources().getDisplayMetrics().density;
         findViewById(R.id.activate_button).setOnClickListener(view -> showActivate());
         ShapeDrawable oval = new ShapeDrawable(new RoundRectShape(new float[]{30 * density, 30 * density, 30 * density, 30 * density, 0, 0, 0, 0}, null, null));
@@ -473,7 +473,7 @@ public class MainActivity extends Activity {
     public void help() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.help_title)
-                .setMessage(R.string.help_conntent)
+                .setMessage(R.string.help_content)
                 .setNegativeButton(R.string.understand, null)
                 .show();
     }
@@ -490,7 +490,7 @@ public class MainActivity extends Activity {
                 .setMessage(R.string.activate_steps)
                 .setTitle(R.string.need_activate)
                 .setNeutralButton(R.string.copy_cmd, (dialogInterface, i) -> {
-                    ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("c", "adb shell " + cmd));
+                    ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("c", "adb shell \"" + cmd +"\""));
                     Toast.makeText(MainActivity.this, String.format(getString(R.string.cmd_copy_finish), cmd), Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton(R.string.by_root, (dialoginterface, i) -> {
