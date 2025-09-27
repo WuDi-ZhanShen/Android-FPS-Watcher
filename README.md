@@ -9,6 +9,9 @@ Module hiddenapi: Provide direct call to hidden api.
 IWindowManager.registerTaskFpsCallback(int taskId, ITaskFpsCallback callback); (Since Android 13+) -- Monitor a task's fps.
 
 
+SurfaceControlFpsListener.register(int taskId); (Only Android 12, 12L) -- Monitor a task's fps.
+
+
 IActivityTaskManager.registerITaskStackListener(ITaskStackListener listener); -- Monitor forground task.
 
 
