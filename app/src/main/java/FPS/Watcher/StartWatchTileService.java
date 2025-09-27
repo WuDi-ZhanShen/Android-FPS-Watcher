@@ -63,7 +63,7 @@ public class StartWatchTileService extends TileService {
             SharedPreferences sp = getSharedPreferences("s", 0);
             if (sp.getBoolean("enable_notification", true)) {
                 if (!((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).areNotificationsEnabled()) {
-                    Toast.makeText(this, R.string.request_perm_nitification, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.request_perm_notification, Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 } else {
                     startForegroundService(new Intent(this, FPSWatchService.class));
@@ -89,7 +89,7 @@ public class StartWatchTileService extends TileService {
             }
             tile.setState(Tile.STATE_ACTIVE);
         }
-        
+
         super.onClick();
     }
 

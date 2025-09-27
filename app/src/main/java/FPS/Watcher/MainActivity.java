@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
                 c = true;
             if (e.getClass() == IllegalStateException.class) {
                 b = false;
-                Toast.makeText(this, R.string.shizuku_notrun, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.shizuku_not_run, Toast.LENGTH_SHORT).show();
             }
         }
         if (b && c) {
@@ -304,7 +304,7 @@ public class MainActivity extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (seekBar.getProgress() < 1) {
                     seekBar.setProgress(1);
-                    Toast.makeText(MainActivity.this, R.string.toosmall, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.too_small, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -336,7 +336,7 @@ public class MainActivity extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (seekBar.getProgress() < 1) {
                     seekBar.setProgress(1);
-                    Toast.makeText(MainActivity.this, R.string.toosmall, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.too_small, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -424,7 +424,7 @@ public class MainActivity extends Activity {
             } else {
                 if (sp.getBoolean("enable_notification", true)) {
                     if (!((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).areNotificationsEnabled()) {
-                        Toast.makeText(this, R.string.request_perm_nitification, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.request_perm_notification, Toast.LENGTH_SHORT).show();
                         requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 0);
                     } else {
                         startForegroundService(new Intent(this, FPSWatchService.class));

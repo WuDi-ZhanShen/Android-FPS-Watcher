@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "FPS.Watcher"
-        minSdk 33
+        minSdk 31
         targetSdk 35
-        versionCode 9
-        versionName "9"
+        versionCode 10
+        versionName "10"
         multiDexEnabled false
 
     }

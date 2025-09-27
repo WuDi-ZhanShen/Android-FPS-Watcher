@@ -10,6 +10,8 @@ public class StartWatchActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 //        setTheme(android.R.style.Theme_NoDisplay);
+
+        // 如果已经激活，Watch会在此Activity启动时发送Binder
         super.onCreate(savedInstanceState);
         if (getSharedPreferences("s", 0).getBoolean("enable_notification", true)) {
             if (!((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).areNotificationsEnabled())

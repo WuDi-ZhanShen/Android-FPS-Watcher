@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -69,7 +70,11 @@ public class RecordDetailActivity extends Activity {
             return;
         }
 
-        file = bundle.getSerializable("csvFile", File.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            file = bundle.getSerializable("csvFile", File.class);
+        } else {
+            file = (File) bundle.get("csvFile");
+        }
 
         if (file == null) {
             Toast.makeText(this, R.string.cant_resolve_csv, Toast.LENGTH_SHORT).show();

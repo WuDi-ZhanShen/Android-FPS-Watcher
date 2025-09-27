@@ -4,8 +4,8 @@
     <string name="disagree">不同意</string>
     <string name="agree">同意</string>
     <string name="privacy">隐私政策</string>
-    <string name="privacypolicy">本软件不会收集、记录或上传您的任何信息。\n</string>
-    <string name="toosmall">太小啦！</string>
+    <string name="privacy_policy">本软件不会收集、记录或上传您的任何信息。\n</string>
+    <string name="too_small">太小啦！</string>
     <string name="all_ok">点击启动</string>
     <string name="not_ok">点击激活帧率计</string>
     <string name="activate_steps">帧率计支持adb，shizuku或root激活。\n\n请注意，帧率计仅支持安卓13+系统。\n</string>
@@ -15,7 +15,7 @@
     <string name="by_root">root激活</string>
     <string name="active_failed">激活失败</string>
     <string name="by_shizuku">Shizuku激活</string>
-    <string name="shizuku_notrun">shizuku未运行</string>
+    <string name="shizuku_not_run">shizuku未运行</string>
     <string name="help_title">帮助</string>
     <string name="help_content">1.静态UI下，帧率可能长时间不更新。这是因为帧率计的原理是回调而非轮询。不会影响到监测游戏帧率。\n\n2.某些类原生系统的“游戏空间”带有实时帧率功能，与帧率计共用一个系统API，因而无法同时开启。\n\n3.长按帧率计的桌面图标，可查看帧率历史记录。\n\n</string>
     <string name="understand">明白</string>
@@ -65,9 +65,9 @@
     <string name="sort_by_label">名称排序</string>
     <string name="save_success">保存成功</string>
     <string name="request_perm_overlay">请开启悬浮窗权限</string>
-    <string name="request_perm_nitification">请开启通知权限</string>
+    <string name="request_perm_notification">请开启通知权限</string>
     <string name="activate_first">请先激活帧率计</string>
-    <string name="longpress_to_activate">长按激活</string>
+    <string name="long_press_to_activate">长按激活</string>
     <string name="activate_success">激活成功</string>
     <string name="notify_fore_change">提示前台APP变动</string>
     <string name="saved">帧率记录已保存，可长按帧率计桌面图标查看</string>

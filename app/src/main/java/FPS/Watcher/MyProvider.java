@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -61,7 +62,14 @@ public class MyProvider extends ContentProvider {
             return;
         }
 
-        BinderContainer container = extras.getParcelable(EXTRA_BINDER, BinderContainer.class);
+        BinderContainer container;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            container = extras.getParcelable(EXTRA_BINDER, BinderContainer.class);
+        } else {
+            container = extras.getParcelable(EXTRA_BINDER);
+        }
+
         if (container == null || container.binder == null) {
             return;
         }
